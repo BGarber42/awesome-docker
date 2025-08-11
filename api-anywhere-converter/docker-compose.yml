@@ -1,0 +1,18 @@
+services:
+  api-converter:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_URL=${DB_URL}
+      - CORS_ORIGIN=*
+    volumes:
+      - csv_data:/app/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  csv_data:
