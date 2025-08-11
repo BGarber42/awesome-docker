@@ -238,6 +238,7 @@ jspm_packages/
 *.swp
 *.swo
 *~
+*.code-workspace
 
 # OS generated files
 .DS_Store
