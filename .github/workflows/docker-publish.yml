@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  ORGANIZATION: awesome-docker
+  ORGANIZATION: BGarber42
 
 jobs:
   build-ephemeral-multi-db-playground:
@@ -31,7 +31,7 @@ jobs:
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        password: ${{ secrets.DOCKER_TOKEN }}
 
     - name: Extract metadata
       id: meta
@@ -116,7 +116,7 @@ jobs:
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        password: ${{ secrets.DOCKER_TOKEN }}
 
     - name: Extract metadata
       id: meta
@@ -166,7 +166,7 @@ jobs:
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        password: ${{ secrets.DOCKER_TOKEN }}
 
     - name: Extract metadata
       id: meta
@@ -216,7 +216,7 @@ jobs:
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        password: ${{ secrets.DOCKER_TOKEN }}
 
     - name: Extract metadata
       id: meta
@@ -266,7 +266,7 @@ jobs:
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        password: ${{ secrets.DOCKER_TOKEN }}
 
     - name: Extract metadata
       id: meta
