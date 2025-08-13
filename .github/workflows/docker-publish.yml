@@ -6,12 +6,55 @@ on:
     tags: [ 'v*' ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 env:
   ORGANIZATION: bgarber42
 
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-publish-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      eph: ${{ steps.filter.outputs.eph }}
+      api: ${{ steps.filter.outputs.api }}
+      brw: ${{ steps.filter.outputs.brw }}
+      tsdb: ${{ steps.filter.outputs.tsdb }}
+      common: ${{ steps.filter.outputs.common }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Detect changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            eph:
+              - 'ephemeral-multi-db-playground/**'
+            api:
+              - 'api-anywhere-converter/**'
+            brw:
+              - 'browserless-debug-ai/**'
+            tsdb:
+              - 'single-image-tsdb-grafana/**'
+            common:
+              - '.github/workflows/docker-publish.yml'
+              - 'README.md'
+              - 'LICENSE'
+
   build-ephemeral-multi-db-playground:
+    needs: changes
+    if: startsWith(github.ref, 'refs/tags/') || needs.changes.outputs.eph == 'true' || needs.changes.outputs.common == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -51,6 +94,9 @@ jobs:
         push: true
         tags: ${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:latest
         labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
 
     - name: Build and push MySQL slim image
       if: github.event_name != 'pull_request'
@@ -62,6 +108,9 @@ jobs:
           DB_TYPE=mysql
         tags: ${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:mysql
         labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
 
     - name: Build and push PostgreSQL slim image
       if: github.event_name != 'pull_request'
@@ -73,6 +122,9 @@ jobs:
           DB_TYPE=postgresql
         tags: ${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:postgres
         labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
 
     - name: Build and push SQLite slim image
       if: github.event_name != 'pull_request'
@@ -84,6 +136,9 @@ jobs:
           DB_TYPE=sqlite
         tags: ${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:sqlite
         labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
 
     - name: Build for PR (no push)
       if: github.event_name == 'pull_request'
@@ -94,8 +149,13 @@ jobs:
         tags: ${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:pr-${{ github.event.number }}
         build-args: |
           DB_TYPE=all
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
 
   build-api-anywhere-converter:
+    needs: changes
+    if: startsWith(github.ref, 'refs/tags/') || needs.changes.outputs.api == 'true' || needs.changes.outputs.common == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -135,6 +195,9 @@ jobs:
         push: true
         tags: ${{ env.ORGANIZATION }}/api-anywhere-converter:latest
         labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
 
     - name: Build for PR (no push)
       if: github.event_name == 'pull_request'
@@ -143,8 +206,13 @@ jobs:
         context: ./api-anywhere-converter
         push: false
         tags: ${{ env.ORGANIZATION }}/api-anywhere-converter:pr-${{ github.event.number }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
 
   build-browserless-debug-ai:
+    needs: changes
+    if: startsWith(github.ref, 'refs/tags/') || needs.changes.outputs.brw == 'true' || needs.changes.outputs.common == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -184,6 +252,9 @@ jobs:
         push: true
         tags: ${{ env.ORGANIZATION }}/browserless-debug-ai:latest
         labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
 
     - name: Build for PR (no push)
       if: github.event_name == 'pull_request'
@@ -192,8 +263,13 @@ jobs:
         context: ./browserless-debug-ai
         push: false
         tags: ${{ env.ORGANIZATION }}/browserless-debug-ai:pr-${{ github.event.number }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
 
   build-single-image-tsdb-grafana:
+    needs: changes
+    if: startsWith(github.ref, 'refs/tags/') || needs.changes.outputs.tsdb == 'true' || needs.changes.outputs.common == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -233,6 +309,9 @@ jobs:
         push: true
         tags: ${{ env.ORGANIZATION }}/single-image-tsdb-grafana:latest
         labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
 
     - name: Build for PR (no push)
       if: github.event_name == 'pull_request'
@@ -241,3 +320,6 @@ jobs:
         context: ./single-image-tsdb-grafana
         push: false
         tags: ${{ env.ORGANIZATION }}/single-image-tsdb-grafana:pr-${{ github.event.number }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
