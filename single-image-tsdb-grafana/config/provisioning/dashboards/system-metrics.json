@@ -1,0 +1,88 @@
+{
+  "uid": "system-metrics",
+  "title": "System Metrics",
+  "tags": ["system", "metrics"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "CPU Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": null, "name": "QuestDB" },
+          "format": "time_series",
+          "rawSql": "SELECT $__time(timestamp), host AS metric, value FROM cpu_usage WHERE $__timeFilter(timestamp) ORDER BY 1"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": null, "name": "QuestDB" },
+          "format": "time_series",
+          "rawSql": "SELECT $__time(timestamp), host AS metric, value FROM memory_usage WHERE $__timeFilter(timestamp) ORDER BY 1"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Disk Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": null, "name": "QuestDB" },
+          "format": "time_series",
+          "rawSql": "SELECT $__time(timestamp), (host || '/' || device) AS metric, value FROM disk_usage WHERE $__timeFilter(timestamp) ORDER BY 1"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Network Traffic",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": null, "name": "QuestDB" },
+          "format": "time_series",
+          "rawSql": "SELECT $__time(timestamp), (host || '/' || interface) AS metric, bytes_in AS value FROM network_traffic WHERE $__timeFilter(timestamp) ORDER BY 1"
+        },
+        {
+          "refId": "B",
+          "datasource": { "type": "postgres", "uid": null, "name": "QuestDB" },
+          "format": "time_series",
+          "rawSql": "SELECT $__time(timestamp), (host || '/' || interface) AS metric, bytes_out AS value FROM network_traffic WHERE $__timeFilter(timestamp) ORDER BY 1"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Application Response Time",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": null, "name": "QuestDB" },
+          "format": "time_series",
+          "rawSql": "SELECT $__time(timestamp), (service || ' ' || endpoint) AS metric, response_time AS value FROM application_metrics WHERE $__timeFilter(timestamp) ORDER BY 1"
+        }
+      ]
+    }
+  ]
+}

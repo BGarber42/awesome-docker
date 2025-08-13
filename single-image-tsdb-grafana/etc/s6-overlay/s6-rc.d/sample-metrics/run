@@ -1,0 +1,2 @@
+#!/bin/bash
+exec /app/venv/bin/python /app/scripts/generate_sample_metrics.py > /app/logs/sample-metrics.log 2>&1

@@ -1,0 +1,3 @@
+#!/bin/bash
+# Health check for QuestDB
+curl -f http://localhost:9000/exec?query=SELECT%201 >/dev/null 2>&1

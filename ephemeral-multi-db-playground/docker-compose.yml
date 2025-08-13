@@ -1,0 +1,27 @@
+services:
+  ephemeral-db:
+    build: .
+    ports:
+      - "8080:8080"
+      - "3306:3306"
+      - "5432:5432"
+    environment:
+      - DB_TYPE=${DB_TYPE:-mysql}
+      - TTL=${TTL:-86400}
+      - DB_NAME=${DB_NAME:-testdb}
+      - DB_USER=${DB_USER:-testuser}
+      - DB_PASSWORD=${DB_PASSWORD:-testpass}
+    volumes:
+      - db_data:/app/data
+      - mysql_data:/var/lib/mysql
+      - postgresql_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  db_data:
+  mysql_data:
+  postgresql_data:

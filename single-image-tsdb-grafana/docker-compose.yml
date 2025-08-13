@@ -1,0 +1,33 @@
+services:
+  tsdb-grafana:
+    build: .
+    ports:
+      - "3000:3000"  # Grafana
+      - "9000:9000"  # QuestDB REST API and Web Console
+      - "8812:8812"  # QuestDB Postgres wire protocol
+      - "9009:9009"  # QuestDB InfluxDB Line Protocol
+    environment:
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - SAMPLE_METRICS=${SAMPLE_METRICS:-true}
+      - SAMPLE_INTERVAL=${SAMPLE_INTERVAL:-15}
+    volumes:
+      - questdb_data:/var/lib/questdb
+      - grafana_data:/var/lib/grafana
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  questdb_data:
+  grafana_data:

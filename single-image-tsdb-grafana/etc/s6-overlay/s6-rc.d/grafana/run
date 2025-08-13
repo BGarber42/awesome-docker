@@ -1,0 +1,2 @@
+#!/bin/bash
+exec /usr/sbin/grafana-server --config=/etc/grafana/grafana.ini --homepath=/usr/share/grafana > /app/logs/grafana.log 2>&1
