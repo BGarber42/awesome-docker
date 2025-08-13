@@ -8,7 +8,6 @@ on:
     branches: [ main ]
 
 env:
-  REGISTRY: docker.io
   ORGANIZATION: BGarber42
 
 jobs:
@@ -25,11 +24,10 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Log in to Container Registry
+    - name: Log in to Docker Hub
       if: github.event_name != 'pull_request'
       uses: docker/login-action@v3
       with:
-        registry: ${{ env.REGISTRY }}
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
 
@@ -37,7 +35,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/ephemeral-multi-db-playground
+        images: ${{ env.ORGANIZATION }}/ephemeral-multi-db-playground
         tags: |
           type=ref,event=branch
           type=ref,event=pr
@@ -51,7 +49,7 @@ jobs:
       with:
         context: ./ephemeral-multi-db-playground
         push: true
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:latest
+        tags: ${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:latest
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Build and push MySQL slim image
@@ -62,7 +60,7 @@ jobs:
         push: true
         build-args: |
           DB_TYPE=mysql
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:mysql
+        tags: ${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:mysql
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Build and push PostgreSQL slim image
@@ -73,7 +71,7 @@ jobs:
         push: true
         build-args: |
           DB_TYPE=postgresql
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:postgres
+        tags: ${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:postgres
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Build and push SQLite slim image
@@ -84,7 +82,7 @@ jobs:
         push: true
         build-args: |
           DB_TYPE=sqlite
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:sqlite
+        tags: ${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:sqlite
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Build for PR (no push)
@@ -93,7 +91,7 @@ jobs:
       with:
         context: ./ephemeral-multi-db-playground
         push: false
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:pr-${{ github.event.number }}
+        tags: ${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:pr-${{ github.event.number }}
         build-args: |
           DB_TYPE=all
 
@@ -110,11 +108,10 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Log in to Container Registry
+    - name: Log in to Docker Hub
       if: github.event_name != 'pull_request'
       uses: docker/login-action@v3
       with:
-        registry: ${{ env.REGISTRY }}
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
 
@@ -122,7 +119,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/api-anywhere-converter
+        images: ${{ env.ORGANIZATION }}/api-anywhere-converter
         tags: |
           type=ref,event=branch
           type=ref,event=pr
@@ -136,7 +133,7 @@ jobs:
       with:
         context: ./api-anywhere-converter
         push: true
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/api-anywhere-converter:latest
+        tags: ${{ env.ORGANIZATION }}/api-anywhere-converter:latest
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Build for PR (no push)
@@ -145,7 +142,7 @@ jobs:
       with:
         context: ./api-anywhere-converter
         push: false
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/api-anywhere-converter:pr-${{ github.event.number }}
+        tags: ${{ env.ORGANIZATION }}/api-anywhere-converter:pr-${{ github.event.number }}
 
   build-browserless-debug-ai:
     runs-on: ubuntu-latest
@@ -160,11 +157,10 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Log in to Container Registry
+    - name: Log in to Docker Hub
       if: github.event_name != 'pull_request'
       uses: docker/login-action@v3
       with:
-        registry: ${{ env.REGISTRY }}
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
 
@@ -172,7 +168,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/browserless-debug-ai
+        images: ${{ env.ORGANIZATION }}/browserless-debug-ai
         tags: |
           type=ref,event=branch
           type=ref,event=pr
@@ -186,7 +182,7 @@ jobs:
       with:
         context: ./browserless-debug-ai
         push: true
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/browserless-debug-ai:latest
+        tags: ${{ env.ORGANIZATION }}/browserless-debug-ai:latest
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Build for PR (no push)
@@ -195,7 +191,7 @@ jobs:
       with:
         context: ./browserless-debug-ai
         push: false
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/browserless-debug-ai:pr-${{ github.event.number }}
+        tags: ${{ env.ORGANIZATION }}/browserless-debug-ai:pr-${{ github.event.number }}
 
   build-distributed-cron-simulator:
     runs-on: ubuntu-latest
@@ -210,11 +206,10 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Log in to Container Registry
+    - name: Log in to Docker Hub
       if: github.event_name != 'pull_request'
       uses: docker/login-action@v3
       with:
-        registry: ${{ env.REGISTRY }}
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
 
@@ -222,7 +217,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/distributed-cron-simulator
+        images: ${{ env.ORGANIZATION }}/distributed-cron-simulator
         tags: |
           type=ref,event=branch
           type=ref,event=pr
@@ -236,7 +231,7 @@ jobs:
       with:
         context: ./distributed-cron-simulator
         push: true
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/distributed-cron-simulator:latest
+        tags: ${{ env.ORGANIZATION }}/distributed-cron-simulator:latest
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Build for PR (no push)
@@ -245,7 +240,7 @@ jobs:
       with:
         context: ./distributed-cron-simulator
         push: false
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/distributed-cron-simulator:pr-${{ github.event.number }}
+        tags: ${{ env.ORGANIZATION }}/distributed-cron-simulator:pr-${{ github.event.number }}
 
   build-single-image-tsdb-grafana:
     runs-on: ubuntu-latest
@@ -260,11 +255,10 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Log in to Container Registry
+    - name: Log in to Docker Hub
       if: github.event_name != 'pull_request'
       uses: docker/login-action@v3
       with:
-        registry: ${{ env.REGISTRY }}
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
 
@@ -272,7 +266,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/single-image-tsdb-grafana
+        images: ${{ env.ORGANIZATION }}/single-image-tsdb-grafana
         tags: |
           type=ref,event=branch
           type=ref,event=pr
@@ -286,7 +280,7 @@ jobs:
       with:
         context: ./single-image-tsdb-grafana
         push: true
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/single-image-tsdb-grafana:latest
+        tags: ${{ env.ORGANIZATION }}/single-image-tsdb-grafana:latest
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Build for PR (no push)
@@ -295,4 +289,4 @@ jobs:
       with:
         context: ./single-image-tsdb-grafana
         push: false
-        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/single-image-tsdb-grafana:pr-${{ github.event.number }}
+        tags: ${{ env.ORGANIZATION }}/single-image-tsdb-grafana:pr-${{ github.event.number }}
