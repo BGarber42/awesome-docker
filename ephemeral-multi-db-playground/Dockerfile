@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12-slim-bookworm
 
 # Build argument for database type (default to 'all' for latest tag)
 ARG DB_TYPE=all
@@ -17,14 +17,14 @@ RUN apt-get update && apt-get install -y \
 
 # Install database servers based on DB_TYPE
 RUN if [ "$DB_TYPE" = "all" ] || [ "$DB_TYPE" = "mysql" ]; then \
-        # Add MySQL repository and install MySQL
-        wget https://dev.mysql.com/get/mysql-apt-config_0.8.29-1_all.deb \
-        && DEBIAN_FRONTEND=noninteractive dpkg -i mysql-apt-config_0.8.29-1_all.deb \
-        && rm mysql-apt-config_0.8.29-1_all.deb \
+        # Add MySQL repository and install MySQL (force bookworm suite)
+        wget https://dev.mysql.com/get/mysql-apt-config_0.8.34-1_all.deb \
+        && DEBIAN_FRONTEND=noninteractive dpkg -i mysql-apt-config_0.8.34-1_all.deb || true \
+        && rm -f mysql-apt-config_0.8.34-1_all.deb \
         && apt-get update \
         && apt-get install -y mysql-server \
         && rm -rf /var/lib/apt/lists/*; \
-    fi
+  fi
 
 RUN if [ "$DB_TYPE" = "all" ] || [ "$DB_TYPE" = "postgresql" ]; then \
         # Add PostgreSQL repository and install PostgreSQL
