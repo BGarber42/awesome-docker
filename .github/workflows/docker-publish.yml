@@ -1,0 +1,298 @@
+name: Docker Build and Publish
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: docker.io
+  ORGANIZATION: awesome-docker
+
+jobs:
+  build-ephemeral-multi-db-playground:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/ephemeral-multi-db-playground
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha
+
+    - name: Build and push all-in-one image (latest)
+      if: github.event_name != 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./ephemeral-multi-db-playground
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:latest
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build and push MySQL slim image
+      if: github.event_name != 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./ephemeral-multi-db-playground
+        push: true
+        build-args: |
+          DB_TYPE=mysql
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:mysql
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build and push PostgreSQL slim image
+      if: github.event_name != 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./ephemeral-multi-db-playground
+        push: true
+        build-args: |
+          DB_TYPE=postgresql
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:postgres
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build and push SQLite slim image
+      if: github.event_name != 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./ephemeral-multi-db-playground
+        push: true
+        build-args: |
+          DB_TYPE=sqlite
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:sqlite
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build for PR (no push)
+      if: github.event_name == 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./ephemeral-multi-db-playground
+        push: false
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/ephemeral-multi-db-playground:pr-${{ github.event.number }}
+        build-args: |
+          DB_TYPE=all
+
+  build-api-anywhere-converter:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/api-anywhere-converter
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha
+
+    - name: Build and push API Anywhere Converter
+      if: github.event_name != 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./api-anywhere-converter
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/api-anywhere-converter:latest
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build for PR (no push)
+      if: github.event_name == 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./api-anywhere-converter
+        push: false
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/api-anywhere-converter:pr-${{ github.event.number }}
+
+  build-browserless-debug-ai:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/browserless-debug-ai
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha
+
+    - name: Build and push Browserless Debug AI
+      if: github.event_name != 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./browserless-debug-ai
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/browserless-debug-ai:latest
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build for PR (no push)
+      if: github.event_name == 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./browserless-debug-ai
+        push: false
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/browserless-debug-ai:pr-${{ github.event.number }}
+
+  build-distributed-cron-simulator:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/distributed-cron-simulator
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha
+
+    - name: Build and push Distributed Cron Simulator
+      if: github.event_name != 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./distributed-cron-simulator
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/distributed-cron-simulator:latest
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build for PR (no push)
+      if: github.event_name == 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./distributed-cron-simulator
+        push: false
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/distributed-cron-simulator:pr-${{ github.event.number }}
+
+  build-single-image-tsdb-grafana:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/single-image-tsdb-grafana
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha
+
+    - name: Build and push Single Image TSDB Grafana
+      if: github.event_name != 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./single-image-tsdb-grafana
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/single-image-tsdb-grafana:latest
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build for PR (no push)
+      if: github.event_name == 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./single-image-tsdb-grafana
+        push: false
+        tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/single-image-tsdb-grafana:pr-${{ github.event.number }}
